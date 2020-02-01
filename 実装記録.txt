@@ -1,0 +1,139 @@
+※first commit
+
+■プログラムの流れ
+	①URLでcommandを取得
+	②コントローラーBoardServletがcommandを確認、ActionFactoryで該当の処理結果をもらって実行する
+
+■■■■■■■■■■BACKEnd■■■■■■■■■■
+
+●com.joon.controller(パッケージ)
+
+	①ActionFactory.java
+		※役割：commandパータンで作業処理のcommandクラス
+		・一つのinstanceを生成するSingleToneパータンを使用
+			→SingleToneパータンの参考：https://commin.tistory.com/121（韓国語）
+			→SingleToneパータンの参考：https://qiita.com/shoheiyokoyama/items/c16fd547a77773c0ccc1(日本語)
+		・オブジェクトを呼び出す時はgetInstanceメソッドでinstanceをreturnする
+		・getAction(String command)メソッド作成
+		・BoardServletからURLで入力されたcommandを取得
+		・com.joon.controller.actionパッケージでcommandに合うxxxAction.javaを呼び出して実行
+		・実行した結果を変数actionに格納しBoardServletに返却
+
+	②BoardServlet.java
+		※役割：URLでrequestを取得、該当のModelとViewを呼び出す
+		・doGet作成
+		・URLで入力されたcommandを取得
+		・ActionFactoryのgetActionにcommandをパラメータで渡す
+		・ActionFactoryで返却された結果を変数actionに格納
+		・actionが存在する場合、インタフェースActionのexecuteメソッドを実行
+		・doPostはdoGetメソッドを呼び出す。
+
+●com.joon.controller.action(パッケージ)
+
+	①Action.java
+		※役割：Command処理クラスのスーパークラスのインタフェース
+		・public void execute(HttpServletRequest request, HttpServletResponse response)作成
+
+	②BoardListAction.java
+		※役割：DBから掲示板リストのすべての投稿物の情報を持ってくる
+		・インタフェースActionをimplementsする（ActionにあるメソッドexecuteをOverride）
+		・BoardDAOのinstanceを呼び出す（BoardDAO bDAOに格納）
+		・全体投稿リストを返却するメソッドselectAllBoardsを実行、List<BoardVO> boardListに格納
+		・requestにboardListをセットする（key,value）
+		・設定したboardListを返却するため、forwardを利用
+		・forwardするためにRequestDispatcher dispatcherにURLを設定する
+
+●com.joon.dao(パッケージ)
+
+	①BoardDAO.java
+		※役割：DBと接続するDB処理クラス
+		・SingleToneパータンを採択
+		・getInstanceメソッド作成
+		・全投稿物をselectAllBoardsを作成
+
+		①-1 selectAllBoards()メソッド
+			※役割：全投稿物を持ってくる
+			・投稿物が1件以上のはずなので、public List<BoardVO> selectAllBoards()に宣言
+			・テーブルboardからすべてを持ってくるSQLを作成（"SELECT * FROM board order by num desc"）
+			・try,catch,finallyを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、Statementを利用、SELECTのSQLを実行
+			・BoardVO bVoを宣言
+			・SQLの実行結果がある場合、bVOにnum,name,email,pass,title,content,readcount,writedateを設定する
+			・listにbVoを追加
+			・catchにエラーメッセージをPrintするように設定
+			・finallyにDBManagerのメソッドcloseを呼び出してDBと接続をクローズする
+			・listをreturnする
+
+
+●com.joon.dto(パッケージ)
+
+	①BoardVO.java
+	※役割：掲示物情報を格納する
+	・下記のcollumを作成
+		private int num;
+		private String name;
+		private String email;
+		private String pass;
+		private String title;
+		private String content;
+		private int readcount;
+		private Timestamp writedate;
+
+	・get,setを設定
+
+●util(パッケージ)
+	①DBManager
+		※役割：DBと接続、接続解除を行う
+		・DBCPを利用するメソッドgetConnectionを作成
+		・Statementを利用した場合のcloseメソッドとPreparedStatementを利用した場合のcloseメソッドを作成
+
+■■■■■■■■■■FrontEnd■■■■■■■■■■
+
+●WebContent(フォルダ)
+	①board
+		①-1 boardList.jsp
+			※役割：すべての投稿物を見れる掲示板リスト
+			・投稿物にnum、title、name、writedate、readcountが表示される
+			・readcountの上に"掲示板登録"リンクを押下し、投稿物登録画面に移動
+			・titleを押下し、投稿物の詳細画面に移動
+
+	②css
+		②-1 shopping.css
+			※役割：掲示物プロジェクト全体にshopping.cssを適用
+
+	③script
+		③-1board.js
+			※役割：入力した情報の有効を判断する
+
+■■■■■■■■■■Database■■■■■■■■■■
+
+	①oracleDBを使用
+	②create table board(
+		num NUMBER(5) PRIMARY KEY,
+		pass VARCHAR2(30),
+		name VARCHAR2(30),
+		email VARCHAR2(30),
+		title VARCHAR2(50),
+		content VARCHAR2(1000),
+		readcount NUMBER(4) DEFAULT 0,
+		writedate DATE DEFAULT SYSDATE
+		);
+
+■■■■■■■■■■サーバ設定■■■■■■■■■■
+	①server.xml
+		Context内にResourceを宣言、oracleを設定
+
+				<Context docBase="board" path="/board"
+					reloadable="true" source="org.eclipse.jst.jee.server:board">
+					<Resource auth="Container"
+						driverClassName="oracle.jdbc.OracleDriver"
+						factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+						maxIdle="10" maxTotal="20" maxWaitMillis="-1" name="jdbc/myoracle"
+						password="root" type="javax.sql.DataSource"
+						url="jdbc:oracle:thin:@127.0.0.1:1521:root" username="root" />
+				</Context>
+
+■■■■■■■■■■jarファイル設定■■■■■■■■■■
+	①WebContent/WEB-INF/libに設定
+		・jstlを設定する / jstl.jar, standard.jar
+		・oracleを設定する /  ojdbc14.jar
