@@ -41,7 +41,7 @@
 				</tr>
 				<tr>
 					<th>内容</th>
-					<td><textarea cols="70" rows="15" name="content">value="${board.content}</textarea>
+					<td><textarea cols="70" rows="15" name="content">${board.content}</textarea>
 					</td>
 				</tr>
 			</table>
