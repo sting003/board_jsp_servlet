@@ -1,0 +1,88 @@
+※second commit(2020/02/08)
+
+■プログラムの流れ
+	①URLでcommandを取得
+	②コントローラーBoardServletがcommandを確認、ActionFactoryで該当の処理結果をもらって実行する
+
+■■■■■■■■■■BACKEnd■■■■■■■■■■
+
+●com.joon.controller(パッケージ)
+
+	①ActionFactory.java
+		①-1 BoardWriteFormAction処理追加
+		①-2 BoardWriteAction処理追加
+		①-3 BoardViewAction処理追加
+
+●com.joon.controller.action(パッケージ)
+
+	①BoardWriteAction.java
+		※役割：入力した情報をDBに追加する
+		・インタフェースActionをimplementsする（ActionにあるメソッドexecuteをOverride）
+		・BoardVOを呼び出す
+		・BoardVO bVoにrequestで取得したname,pass,email,title,contentをセットする
+		・BoardDAOのinstanceを呼び出し、BoardDAO bDaoに格納
+		・bDaoでinsertBoardを呼び出し、パラメータにbVOをセットする
+		・new BoardListAction().execute(request, response)で掲示板リストに戻る
+
+	②BoardWriteFormAction.java
+		※役割：掲示板登録画面に遷移
+		・インタフェースActionをimplementsする（ActionにあるメソッドexecuteをOverride）
+		・RequestDispatcher dispatcherにURLを設定（"/board/boardWrite.jsp"）
+		・request,responseをforwardする
+
+	③BoardViewAction.java
+		※役割：該当の投稿物のreadCountを更新、詳細情報画面に遷移する
+		・BoardDAO bDaoでupdateCountメソッドを呼び出し、readCountを更新する
+		・BoardDAO bDaoでselectOneBoardByNumメソッドを呼び出し、該当の投稿物の詳細情報をBoardVo bVoに格納
+		・requestにbVoを設定する
+		・RequestDispatcher dispatcherにURLを設定（"/board/boardView.jsp"）
+		・request,responseをforwardする
+
+●com.joon.dao(パッケージ)
+
+	①BoardDAO.java
+		・投稿物作成するinsertBoard処理を作成
+
+		①-1 insertBoard(BoardVO bVo)メソッド
+			※役割：入力した情報をDBに格納する
+			・登録するだけなので返却値がないvoidにする
+			・テーブルboardにINSERTするSQL作成"insert into board("
+							+ "num, name, email, pass, title, content"
+							+ "values(AUTO_INCREMENT, ?, ?, ?, ?, ?))"
+
+			・try,catch,finallyを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、PreparedStatementを利用、INSERTのSQLを実行
+			・PreparedStatementに上記の?をセットする（pstmt.setString(1, bVo.getName());...）
+			・PreparedStatementのメソッドexecuteUpdateを利用、INSERTを実行
+			・catchにエラーメッセージをPrintするように設定
+			・finallyにDBManagerのメソッドcloseを呼び出してDBと接続をクローズする
+
+		①-2 selectOneBoardByNum(String num) メソッド
+			※役割：押下した投稿物の情報を持ってくる、該当の投稿物の詳細画面に遷移
+			・パラメータnumで投稿物の詳細確認
+			・投稿物1件だけを呼び出すので、BoardVOにする
+			・クリックした投稿物のnumを利用、SELECTするSQLを作成（"select * from board where num = ?"）
+			・try,catch,finallyを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、PreparedStatementを利用、SELECTのSQLを実行
+			・PreparedStatementに上記の?をセットする（pstmt.setString(1, num））
+			・PreparedStatementのメソッドexecuteQueryを利用、SELECTを実行
+			・SQLの実行結果がある場合、bVOにnum,name,email,pass,title,content,readcount,writedateを設定する
+			・catchにエラーメッセージをPrintするように設定
+			・finallyにDBManagerのメソッドcloseを呼び出してDBと接続をクローズする
+			・bVOを返却する
+
+■■■■■■■■■■FrontEnd■■■■■■■■■■
+
+●WebContent(フォルダ)
+	①board
+		①-1 boardWrite.jsp
+			※役割：投稿物を登録する画面
+			・name,pass,email,title,contentを入力、登録ボタンを押下し、DBに入力した情報が登録、掲示板リストに遷移される
+			・resetボタンを押下し、作成フォーマットの情報を削除される
+			・listボタンを押下し、掲示板リストに遷移される
+
+		①-2 boardView.jsp
+			※役割：投稿物の詳細情報を表示する画面
+			・boardList画面のタイトルを押下し、boardView画面に遷移
+			・作成した作成者、作成日、タイトル、readCount、email、内容が表示される
+			・投稿物の修正、削除、登録、boardListに戻るボタンがある

@@ -18,7 +18,7 @@
 <table class="list">
 	<tr>
 		<td colspan="5" style="border: white; text-align: right">
-			<a href="BoardServlet?command=board_write_form">投稿</a>
+			<a href="BoardServlet?command=board_write_form">投稿物作成</a>
 		</td>
 	</tr>
 	<tr>

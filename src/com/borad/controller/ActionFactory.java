@@ -1,7 +1,11 @@
+
 package com.borad.controller;
 
 import com.borad.controller.action.Action;
 import com.borad.controller.action.BoardListAction;
+import com.borad.controller.action.BoardViewAction;
+import com.borad.controller.action.BoardWriteAction;
+import com.borad.controller.action.BoardWriteFormAction;
 
 public class ActionFactory {
 
@@ -22,6 +26,12 @@ public class ActionFactory {
 		System.out.println("ActionFactory :" + command);
 		if (command.equals("board_list")) {
 			action = new BoardListAction();
+		} else if(command.equals("board_write_form")) {
+			action = new BoardWriteFormAction();
+		} else if (command.equals("board_write")) {
+			action = new BoardWriteAction();
+		} else if (command.equals("board_view")) {
+			action = new BoardViewAction();
 		}
 
 		return action;

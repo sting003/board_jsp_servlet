@@ -1,4 +1,4 @@
-※first commit
+※first commit(2020/02/01)
 
 ■プログラムの流れ
 	①URLでcommandを取得
