@@ -9,42 +9,42 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>게시판</title>
+<title>掲示板</title>
 <link rel="stylesheet" type="text/css" href="css/shopping.css">
 <script type="text/javascript" src="script/board.js"></script>
 </head>
 <body>
 <div id="wrap" align="center">
-<h1>게시글 등록</h1>
+<h1>投稿物　登録</h1>
 	<form name="frm" method="post" action="BoardServlet">
 		<input type="hidden" name="command" value="board_write">
 		 <table>
 		 	<tr>
-		 		<th>작성자</th>
-		 		<td><input type="text" name="name">* 필수</td>
+		 		<th>作成者</th>
+		 		<td><input type="text" name="name">* 必須</td>
 		 	</tr>
 		 	<tr>
-		 		<th>비밀번호</th>
-		 		<td><input type="password" name="pass">* 필수(게시물 수정 삭제시 필요합니다.)</td>
+		 		<th>パスワード</th>
+		 		<td><input type="password" name="pass">* 必須</td>
 		 	</tr>
 		 	<tr>
-		 		<th>이메일</th>
+		 		<th>email</th>
 		 		<td><input type="text" name="email"></td>
 		 	</tr>
 		 	<tr>
-		 		<th>제목</th>
+		 		<th>タイトル</th>
 		 		<td><input type="text" size="70" name="title">* 필수</td>
 		 	</tr>
 
 		 	<tr>
-		 		<th>내용</th>
+		 		<th>内容</th>
 		 		<td><textarea cols="70" rows="15" name="content"></textarea></td>
 		 	</tr>
 		 </table>
 		 <br><br>
-		 <input type="submit" value="등록" onclick="return boardCheck()">
-		 <input type="reset" value="다시 작성">
-		 <input type="button" value="목록" onclick="location.href='BoardServlet?command=board_list'">
+		 <input type="submit" value="登録" onclick="return boardCheck()">
+		 <input type="reset" value="reset">
+		 <input type="button" value="Board Listに戻る" onclick="location.href='BoardServlet?command=board_list'">
 	</form>
 	</div>
 	</body>

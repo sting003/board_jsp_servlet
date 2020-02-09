@@ -9,45 +9,45 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>게시판</title>
+<title>掲示板</title>
 <link rel="stylesheet" type="text/css" href="css/shopping.css">
 <script type="text/javascript" src="script/board.js"></script>
 </head>
 <body>
 	<div id="wrap" align="center">
-		<h1>게시글 상세보기</h1>
+		<h1>投稿物 詳細情報</h1>
 		<table>
 			<tr>
-				<th>작성자</th>
+				<th>作成者</th>
 				<td>${board.num }</td>
-				<th>이메일</th>
+				<th>email</th>
 				<td>${board.email }</td>
 			</tr>
 			<tr>
-				<th>작성일</th><td><fmt:formatDate value="${board.writedate}"/></td>
-				<th>조회수</th>
+				<th>作成日</th><td><fmt:formatDate value="${board.writedate}"/></td>
+				<th>read count</th>
 				<td>${board.readcount }</td>
 			</tr>
 			<tr>
-				<th>제목</th>
+				<th>タイトル</th>
 				<td colspan="3">${board.title }</td>
 			</tr>
 			<tr>
-				<th>내용</th>
+				<th>内容</th>
 				<td colspan="3"><pre>${board.content }</pre></td>
 			</tr>
 		</table>
 		<br>
 		<br>
-		<input type="button" value="게시글 수정"
+		<input type="button" value="投稿物を修正"
 			onclick="open_win('BoardServlet?command=board_check_pass_form&num=${board.num}',
 			'update')">
-		<input type="button" value="게시글 삭제"
+		<input type="button" value="投稿物を削除"
 			onclick="open_win('BoardServlet?command=board_check_pass_form&num=${board.num}',
 			'delete')">
-		<input type="button" value="게시글 리스트"
+		<input type="button" value="Board Listに戻る"
 			onclick="location.href='BoardServlet?command=board_list'">
-		<input type="button" value="게시글 등록"
+		<input type="button" value="投稿物を登録"
 			onclick="location.href='BoardServlet?command=board_write_form'">
 	</div>
 </body>

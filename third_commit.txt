@@ -1,0 +1,99 @@
+※second commit(2020/02/08)
+
+■プログラムの流れ
+	①URLでcommandを取得
+	②コントローラーBoardServletがcommandを確認、ActionFactoryで該当の処理結果をもらって実行する
+
+■■■■■■■■■■BACKEnd■■■■■■■■■■
+
+●com.joon.controller(パッケージ)
+
+	①ActionFactory.java
+		①-1 BoardCheckPassFormAction処理追加
+		①-2 BoardCheckPassAction処理追加
+		①-3 BoardUpdateFormAction処理追加
+		①-4 BoardUpdateAction処理追加
+		①-5 BoardDeleteAction処理追加
+
+●com.joon.controller.action(パッケージ)
+
+	①BoardCheckPassFormAction.java
+		※役割：投稿物の修正、削除処理を行う前に投稿物のパスワードを確認する画面
+		・RequestDispatcher dispatcherにURLを設定（"/board/boardCheckPass.jsp"）
+		・request,responseをforwardする
+
+	②BoardCheckPassAction.java
+		※役割：投稿物の修正、削除処理を行う前に投稿物のパスワードを確認する処理
+		・BoardDAO bDaoでselectOneBoardByNumメソッドを呼び出し、BoardVO bVoに投稿物の情報を格納する
+		・boardCheckPass画面で入力したパスワードとbVoで取得したパスワードが一致する場合、/board/checkSuccess.jspを変数urlに格納
+		・boardCheckPass画面で入力したパスワードとbVoで取得したパスワードが一致しない場合、/board/boardCheckPass.jspを変数urlに格納、requestにパスワードを確認してくださいというメッセージを設定
+		・RequestDispatcher dispatcherにURLを設定
+		・request,responseをforwardする
+
+	③BoardUpdateFormAction.java
+		※役割：該当の投稿物の修正処理を行う
+		・BoardDAO bDaoでselectOneBoardByNumメソッドを呼び出し、BoardVO bVoに投稿物の情報を格納する
+		・bVoをrequestに格納、設定する
+		・RequestDispatcher dispatcherにURLを設定（"/board/boardUpdate.jsp"）
+		・request,responseをforwardする
+
+	③BoardUpdateAction.java
+		※役割：該当の投稿物の修正処理を行う
+		・BoardVO bVoにrequestで取得した番号、作成者、パスワード、email、タイトル、内容を格納する
+		・BoardDAO bDaoでupdateBoardメソッドを呼び出す
+		・BoardListActionを利用、掲示板リスト画面に遷移
+
+	③BoardDeleteAction.java
+		※役割：該当の投稿物の削除処理を行う
+		・BoardDAO bDaoのdeleteBoardを呼び出す
+		・BoardListActionを利用、掲示板リスト画面に遷移
+
+●com.joon.dao(パッケージ)
+
+	①BoardDAO.java
+		・投稿物作成するinsertBoard処理を作成
+
+		①-1 updateBoard(BoardVO bVo) メソッド
+			※役割：修正した情報をDBに格納する
+			・UPDATEのSQL作成（"update board set name=?,email=?, "
+							+ "pass=?, title=?, content=?, where=num? "）
+			・try,catch,finallyを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、PreparedStatementを利用、UPDATEのSQLを実行
+			・PreparedStatementに上記の?をセットする（pstmt.setString(1, bVo.getName());...）
+			・PreparedStatementのメソッドexecuteUpdateを利用、UPDATEを実行
+			・catchにエラーメッセージをPrintするように設定
+			・finallyにDBManagerのメソッドcloseを呼び出してDBと接続をクローズする
+
+		①-2 checkPassWord(String pass, String num) メソッド
+			※役割：投稿物の削除するためにパスワードを確認する
+			・SELECTのSQL作成（"select * form board pass=? and num=?"）
+			・try,catchを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、PreparedStatementを利用、UPDATEのSQLを実行
+			・PreparedStatementに上記の?をセットする（pstmt.setString(1, pass);...）
+			・PreparedStatementのメソッドexecuteUpdateを利用、UPDATEを実行
+			・SQLの実行結果がある場合、bVOにnum,name,email,pass,title,content,readcount,writedateを設定する
+			・catchにエラーメッセージをPrintするように設定
+			・bVoを返却する
+
+		①-3 deleteBoard(String num) メソッド
+			※役割：該当の投稿物を削除する
+			・投稿物を削除するだけなので、返却値がないvoidにする
+			・DELETEのSQLを作成（"delete board where num =?"）
+			・try,catchを作成
+			・DBMangerのメソッドgetConnectionを呼び出し、PreparedStatementを利用、DELETEのSQLを実行
+			・PreparedStatementに上記の?をセットする（pstmt.setString(1,num)）
+			・PreparedStatementのメソッドexecuteUpdateを利用、DELETEを実行
+			・catchにエラーメッセージをPrintするように設定
+
+■■■■■■■■■■FrontEnd■■■■■■■■■■
+
+●WebContent(フォルダ)
+	①board
+		①-1 boardCheckPass.jsp
+			※役割：投稿物のパスワードを確認する画面
+
+		①-2 boardUpdate.jsp
+			※役割：投稿物の詳細情報を修正する画面
+・
+		①-2 checkSuccess.jsp
+			※役割：投稿物のパスワードが一致した場合、修正、削除処理commandを行う
